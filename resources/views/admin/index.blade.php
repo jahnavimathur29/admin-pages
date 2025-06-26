@@ -1,6 +1,9 @@
 @extends('admin::admin.layouts.master')
 
 @section('title', 'Pages Management')
+@section('meta_description')
+Manage pages in the admin panel: create, edit, update, and control page titles, content, and publication status.
+@endsection
 
 @section('page-title', 'Manage Pages')
 

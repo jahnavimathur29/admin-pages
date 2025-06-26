@@ -1,6 +1,9 @@
 @extends('admin::admin.layouts.master')
 
 @section('title', 'Pages Management')
+@section('meta_description')
+Create, edit, or update pages in the admin panel. Manage page titles, content, and status.
+@endsection
 
 @section('page-title', 'Create Page')
 
@@ -24,7 +27,7 @@
                         <div class="row">
                             <div class="col-md-6">                                
                                 <div class="form-group">
-                                    <label>Title<span class="text-danger">*</span></label>
+                                    <label>Title</label>
                                     <input type="text" name="title" class="form-control"
                                         value="{{ $page?->title ?? old('title') }}" required>
                                     @error('title')
@@ -34,7 +37,7 @@
                             </div>
                             <div class="col-md-6">
                                  <div class="form-group">
-                                    <label>Status<span class="text-danger">*</span></label>
+                                    <label>Status</label>
                                     <select name="status" class="form-control select2" required>
                                         <option value="draft" {{ (($page?->status ?? old('status')) == 'draft') ? 'selected' : '' }}>Draft</option>
                                         <option value="published" {{ (($page?->status ?? old('status')) == 'published') ? 'selected' : '' }}>Published</option>
@@ -49,7 +52,7 @@
 
 
                         <div class="form-group">
-                            <label>Content<span class="text-danger">*</span></label>
+                            <label>Content</label>
                             <textarea name="content" id="content" class="form-control description-editor">{{ $page?->content ?? old('content') }}</textarea>
                             @error('content')
                                 <div class="text-danger validation-error">{{ $message }}</div>
@@ -86,24 +89,12 @@
 
     <!-- Initialize CKEditor -->
     <script>
-    let ckEditorInstance;
-
     ClassicEditor
     .create(document.querySelector('#content'))
     .then(editor => {
-        ckEditorInstance = editor;
-
-        // optional styling
         editor.ui.view.editable.element.style.minHeight = '250px';
         editor.ui.view.editable.element.style.maxHeight = '250px';
-        editor.ui.view.editable.element.style.overflowY = 'auto';
-
-        // 🔥 Trigger validation on typing
-        editor.model.document.on('change:data', () => {
-            const contentVal = editor.getData();
-            $('#content').val(contentVal); // keep textarea updated
-            $('#content').trigger('keyup'); // trigger validation manually
-        });
+        editor.ui.view.editable.element.style.overflowY = 'auto'; // optional scroll
     })
     .catch(error => {
         console.error(error);
@@ -117,7 +108,6 @@
 
             //jquery validation for the form
             $('#pageForm').validate({
-                ignore: [],
                 rules: {
                     title: {
                         required: true,
@@ -144,24 +134,11 @@
                         required: "Please select a status"
                     }
                 },
-                submitHandler: function(form) {
-                    // Update textarea before submit
-                    if (ckEditorInstance) {
-                        $('#content').val(ckEditorInstance.getData());
-                    }
-
-                    // Now submit
-                    form.submit();
-                },
                 errorElement: 'div',
                 errorClass: 'text-danger custom-error',
                 errorPlacement: function(error, element) {
-                    $('.validation-error').hide(); // hide blade errors
-                    if (element.attr("id") === "content") {
-                        error.insertAfter($('.ck-editor')); // show below CKEditor UI
-                    } else {
-                        error.insertAfter(element);
-                    }
+                    $('.validation-error').css('display', 'none'); // remove existing error messages
+                    error.addClass('mt-1').insertAfter(element);
                 }
             });
         });
